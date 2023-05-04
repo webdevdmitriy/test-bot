@@ -1,7 +1,13 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import F, Bot, Dispatcher, types
+from aiogram.filters import Text, Command
+
+from aiogram.types import BotCommand, BotCommandScopeDefault
+
+
 import asyncio
 import logging
-from aiogram.types import BotCommand, BotCommandScopeDefault
+
+
 
 TOKEN = "5828168135:AAHLMf9rjdGf2d8nqmLlzfKBAO7HSgc8JzA"
 
@@ -38,6 +44,20 @@ async def echo(message: types.Message):
     print(message.text)
     await message.answer(message.text)
 
+async def text(message: types.Message):
+    await message.answer("Ты ввел текст вот такой:" + message.text) 
+
+async def on_start(message: types.Message):
+    await message.reply("Начинаем работать")
+
+async def hi_admin(message: types.Message):
+    await message.reply("Привет, Админ")
+
+async def picture(message: types.Message):
+    await message.reply("Да это же картинка!")
+
+ 
+
 async def start():
     logging.basicConfig(
         level = logging.INFO
@@ -47,8 +67,19 @@ async def start():
 
     dp.startup.register(start_up)
     dp.shutdown.register(sd)
+# 
+
+    dp.message.register(on_start, Command(commands='start'))
+
+    # Фильтры
+    dp.message.register(picture, F.photo) # фильтр по картинке
+    dp.message.register(hi_admin, F.from_user.id == int(admin_id), F.text == 'Привет' ) # фильтр по id пользователя
+    dp.message.register(text, Text(text='Салют')) # фильтр по тексту
+
 
     dp.message.register(echo)
+
+
     await dp.start_polling(bots)
 
 
