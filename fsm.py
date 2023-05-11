@@ -8,12 +8,10 @@ from aiogram.fsm.state import State, StatesGroup
 
 
 
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand, BotCommandScopeDefault, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 
 
 import asyncio
-
-
 
 class States(StatesGroup):
     first_name = State()
@@ -75,16 +73,32 @@ async def teplehone(message: types.Message, state: FSMContext):
                          f"Имя - {data['first_name']} \n"
                          f"Фамилий - {data['last_name']} \n"
                          f"Телефон - {data['telephone']} \n"
-                         f"Подтвердите или отмените"
-
+                         f"Подтвердите или отмените",
+                        # Инлайн кнопки
+                         reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                              [
+                                 InlineKeyboardButton(
+                                    text='Подвердить',
+                                    callback_data='confirm'
+                                 ),
+                                InlineKeyboardButton(
+                                    text='Отменить',
+                                    callback_data='cancel'
+                                 )
+                             ]
+                         
+                         ]
+                            
                          )
+    )
 
-async def complete(message: types.Message, state: FSMContext):
-    await message.answer('Данные приняты')
+async def confirm(call: CallbackQuery, state: FSMContext, bot: Bot):
+    await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None) # Скрытие инлайн кнопок
+    await call.answer('Данные приняты')
     await state.clear()
 
-async def cancel(message: types.Message, state: FSMContext):
-    await message.answer('Данные отклонены. Введите новые данные')
+async def cancel(call: CallbackQuery, state: FSMContext):
+    await call.answer('Данные отклонены. Введите новые данные!')
     await state.clear()
 
 async def start():
@@ -96,16 +110,16 @@ async def start():
 
     dp.startup.register(start_up)
     dp.shutdown.register(sd)
- 
-
-    dp.message.register(cancel, Text(text='cancel', ignore_case =True))
+  
     dp.message.register(on_start, Command(commands='start'))
     dp.message.register(first_name, States.first_name)
     dp.message.register(last_name, States.last_name)
     dp.message.register(teplehone, States.telephone)
-    dp.message.register(complete, States.complete, Text(text='finish', ignore_case =True))
 
 
+    # Инлайн кнопки
+    dp.callback_query.register(confirm, States.complete, F.data == 'confirm')
+    dp.callback_query.register(cancel, States.complete, F.data == 'cancel')
 
     await dp.start_polling(bots)
 
