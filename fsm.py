@@ -84,6 +84,10 @@ async def teplehone(message: types.Message, state: FSMContext):
                                 InlineKeyboardButton(
                                     text='Отменить',
                                     callback_data='cancel'
+                                 ),
+                                  InlineKeyboardButton(
+                                    text='Перейти на сайт',
+                                    url = 'https://vk.com'
                                  )
                              ]
                          
@@ -94,6 +98,7 @@ async def teplehone(message: types.Message, state: FSMContext):
 
 async def confirm(call: CallbackQuery, state: FSMContext, bot: Bot):
     await bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=None) # Скрытие инлайн кнопок
+    await bot.answer_callback_query(call.id, 'Подтвердили данные', show_alert=True)
     await call.answer('Данные приняты')
     await state.clear()
 
