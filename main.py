@@ -9,12 +9,12 @@ import logging
 
 
 
-TOKEN = "5828168135:AAHLMf9rjdGf2d8nqmLlzfKBAO7HSgc8JzA"
+
 
 
 admin_id = '302594040'
 
-logger = logging.getLogger(__name__)
+
 
 
 async def comm(bot: Bot):
@@ -58,16 +58,8 @@ async def picture(message: types.Message):
 
  
 
-async def start():
-    logging.basicConfig(
-        level = logging.INFO
-    )
-    bots = Bot(TOKEN)
-    dp = Dispatcher()
 
-    dp.startup.register(start_up)
-    dp.shutdown.register(sd)
-# 
+#
 
     dp.message.register(on_start, Command(commands='start'))
 
@@ -80,8 +72,7 @@ async def start():
     dp.message.register(echo)
 
 
-    await dp.start_polling(bots)
 
 
-if __name__ == '__main__':
-    asyncio.run(start())
+
+
