@@ -7,7 +7,10 @@ from aiogram.types import BotCommand, CallbackQuery, BotCommandScopeDefault
 from aiogram.filters import Text, Command
 
 
+
 from keyboards.inline import kb_confirm
+from other.db_connect import Request
+
 
 
 class States(StatesGroup):
@@ -41,8 +44,9 @@ async def sd(bot: Bot):
     await bot.send_message(admin_id, text = 'Бот выключен')
 
 
-async def on_start(message: types.Message, state: FSMContext):
+async def on_start(message: types.Message, state: FSMContext, request: Request):
     await message.answer("Введите необходимые данные. \nВведите имя")
+    await request.add_user(message)
     await state.set_state(States.first_name)
 
 async def first_name(message: types.Message, state: FSMContext):
